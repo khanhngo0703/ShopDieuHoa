@@ -1,23 +1,26 @@
 <?php
+session_start();
+
 require_once 'admin/connect.php';
 
-$sql = "SELECT * FROM collections";
+$sql = "SELECT * FROM categories";
 $result = $conn->query($sql);
 if ($result->num_rows > 0) {
-    $lst_clt = $result->fetch_all(MYSQLI_ASSOC);
-}else {
-    $lst_clt = [];
+    $lst_ct = $result->fetch_all(MYSQLI_ASSOC);
+} else {
+    $lst_ct = [];
 }
 
-if(isset($_GET['action'])) {
+if (isset($_GET['action'])) {
     $tam = $_GET['action'];
-}else {
+} else {
     $tam = '';
 }
 
-if($tam == 'quanlysp') {
+if ($tam == 'quanlysp') {
     require_once 'shop.php';
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -47,9 +50,9 @@ if($tam == 'quanlysp') {
                         <ul>
                             <li class="active"><a href="#">Home</a></li>
                             <?php
-                            foreach ($lst_clt as $clt) :
+                            foreach ($lst_ct as $ct) :
                             ?>
-                                <li><a href="shop.php?action=quanlysp&id=<?php echo $clt['id']; ?>"><?php echo $clt['collection_name'];  ?></a></li>
+                                <li><a href="shop.php?action=quanlysp&id=<?php echo $ct['id']; ?>"><?php echo $ct['category_name'];  ?></a></li>
 
                             <?php
                             endforeach
@@ -64,13 +67,29 @@ if($tam == 'quanlysp') {
                 </div>
                 <div class="col-lg-3">
                     <div class="header_right">
-                        <div class="header_right_auth">
-                            <a href="#"><button class="btn btn-warning">Register</button></a>
-                            <a href="#"><button class="btn btn-warning">LogIn</button></a>
-                            <a href="#"><i class="fas fa-shopping-cart"></i></a>
+                        <div class="header_right_auth" style="display: flex; align-items: center;">
+                            <?php if (isset($_SESSION['loginus'])) : ?>
+                                <h2 style="margin-right: 10px;">Hi, <?php echo htmlspecialchars($_SESSION['loginus']); ?>!</h2>
+                                <button id="logoutBtn" class="btn btn-danger">Logout</button>
+                            <?php else : ?>
+                                <a href="registerHome.php"><button class="btn btn-warning">Register</button></a>
+                                <a href="loginHome.php"><button class="btn btn-warning">LogIn</button></a>
+                            <?php endif; ?>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
     </header>
+    <script>
+        document.getElementById("logoutBtn")?.addEventListener("click", function() {
+            fetch("logout.php")
+                .then(response => response.text())
+                .then(data => {
+                    if (data.trim() === "success") {
+                        location.reload(); // Làm mới trang để cập nhật giao diện
+                    }
+                });
+        });
+    </script>

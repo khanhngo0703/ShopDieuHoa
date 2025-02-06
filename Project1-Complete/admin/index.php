@@ -1,27 +1,34 @@
 <?php
+ob_start();
 session_start();
 require_once 'connect.php';
 
-$sql = "SELECT * FROM admincp";
+$sql = "SELECT * FROM users";
 
 $result = $conn->query($sql);
 if ($result->num_rows > 0) {
-    $lst_ad = $result->fetch_all(MYSQLI_ASSOC);
+    $lst_us = $result->fetch_all(MYSQLI_ASSOC);
 } else {
-    $lst_ad = [];
+    $lst_us = [];
 }
 
-if (!isset($_SESSION['loginad'])) {
+if (!isset($_SESSION['loginad']) || $_SESSION['loginad'] !== true) {
     header('Location: login.php');
-    exit(); // Dừng script ngay lập tức
+    exit();
 }
 
 if (isset($_GET['logout'])) {
+    session_unset();
     session_destroy();
-
+    
+    if (isset($_COOKIE[session_name()])) {
+        setcookie(session_name(), '', time() - 3600, '/');
+    }
+    
     header('Location: login.php');
-    die();
+    exit();
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -30,6 +37,9 @@ if (isset($_GET['logout'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -72,7 +82,7 @@ if (isset($_GET['logout'])) {
         <h3>ADMIN PANEL</h3>
         <a href="#">Dashboard</a>
         <a href="#">Quản lý tài khoản</a>
-        <a href="addprd.php">Thêm sản phẩm</a>
+        <a href="#">Quản lý sản phẩm</a>
         <a href="login.php?logout=true">Đăng xuất</a>
     </div>
     <div class="content">
@@ -83,20 +93,24 @@ if (isset($_GET['logout'])) {
                     <thead class="table-dark">
                         <tr>
                             <th>Id</th>
-                            <th>Name</th>
+                            <th>Username</th>
+                            <th>Email</th>
                             <th>Password</th>
-                            <th>Hành động</th>
+                            <th>Created_At</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($lst_ad as $i => $ad): ?>
+                        <?php foreach ($lst_us as $i => $us): ?>
                             <tr>
                                 <td><?= $i + 1 ?></td>
-                                <td><?= htmlspecialchars($ad['admin_username']) ?></td>
-                                <td>******</td>
+                                <td><?= htmlspecialchars($us['username']) ?></td>
+                                <td><?= htmlspecialchars($us['email']) ?></td>
+                                <td><?= htmlspecialchars($us['password']) ?></td>
+                                <td><?= htmlspecialchars($us['created_at']) ?></td>
                                 <td>
-                                    <a href="updateadmin.php?id=<?= $ad['id'] ?>" class="btn btn-warning">Cập nhật</a>
-                                    <a onclick="return confirm('Bạn có chắc muốn xóa?')" href="deleteadmin.php?id=<?= $ad['id'] ?>" class="btn btn-danger">Xóa</a>
+                                    <a href="updateUserAccount.php?id=<?= $us['id'] ?>" class="btn btn-warning">Update</a>
+                                    <a onclick="return confirm('Bạn có chắc muốn xóa?')" href="deleteUserAccount.php?id=<?= $us['id'] ?>" class="btn btn-danger">Delete</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

@@ -23,9 +23,9 @@ $conn->select_db("project1");
 
 // Tạo bảng collections
 try {
-    $sql = "CREATE TABLE IF NOT EXISTS collections (
+    $sql = "CREATE TABLE IF NOT EXISTS categories (
         id INT NOT NULL AUTO_INCREMENT,
-        collection_name VARCHAR(50) NOT NULL,
+        category_name VARCHAR(50) NOT NULL,
         PRIMARY KEY (id)
     )";
     $conn->query($sql);
@@ -33,30 +33,17 @@ try {
     echo "Error creating collections table: " . $e->getMessage();
 }
 
-// Tạo bảng stylists
-try {
-    $sql = "CREATE TABLE IF NOT EXISTS stylists (
-        id INT NOT NULL AUTO_INCREMENT,
-        stylist_name VARCHAR(50) NOT NULL,
-        PRIMARY KEY (id)
-    )";
-    $conn->query($sql);
-} catch (Exception $e) {
-    echo "Error creating stylists table: " . $e->getMessage();
-}
 
-// Tạo bảng products (sau khi đã có collections và stylists)
+// Tạo bảng products
 try {
     $sql = "CREATE TABLE IF NOT EXISTS products (
         id INT NOT NULL AUTO_INCREMENT,
         product_name VARCHAR(50) NOT NULL,
         price FLOAT NOT NULL,
         thumbnail VARCHAR(100) NOT NULL,
-        collection_id INT NOT NULL,
-        stylist_id INT NOT NULL,
+        category_id INT NOT NULL,
         PRIMARY KEY (id),
-        FOREIGN KEY (collection_id) REFERENCES collections(id) ON DELETE CASCADE,
-        FOREIGN KEY (stylist_id) REFERENCES stylists(id) ON DELETE CASCADE
+        FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
     )";
     $conn->query($sql);
 } catch (Exception $e) {
@@ -74,4 +61,19 @@ try {
     $conn->query($sql);
 } catch (Exception $e) {
     echo "Error creating admincp table: " . $e->getMessage();
+}
+
+// Tạo bảng users
+try {
+    $sql = "CREATE TABLE IF NOT EXISTS users (
+        id INT NOT NULL AUTO_INCREMENT,
+        username VARCHAR(50) NOT NULL UNIQUE,
+        email VARCHAR(100) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+    )";
+    $conn->query($sql);
+} catch (Exception $e) {
+    echo "Error creating users table: " . $e->getMessage();
 }
