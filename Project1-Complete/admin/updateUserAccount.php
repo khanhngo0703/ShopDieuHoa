@@ -66,7 +66,7 @@ if (isset($_GET['id'])) {
 
 <body>
     <div class="container">
-        <div class="card">
+        <div class="card" style="margin-top: 60px;">
             <div class="card-header">
                 <h5 class="mb-0">Update User Account</h5>
             </div>
