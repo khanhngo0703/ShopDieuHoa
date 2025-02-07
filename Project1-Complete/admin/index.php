@@ -20,11 +20,11 @@ if (!isset($_SESSION['loginad']) || $_SESSION['loginad'] !== true) {
 if (isset($_GET['logout'])) {
     session_unset();
     session_destroy();
-    
+
     if (isset($_COOKIE[session_name()])) {
         setcookie(session_name(), '', time() - 3600, '/');
     }
-    
+
     header('Location: login.php');
     exit();
 }
@@ -110,7 +110,9 @@ if (isset($_GET['logout'])) {
                                 <td><?= htmlspecialchars($us['created_at']) ?></td>
                                 <td>
                                     <a href="updateUserAccount.php?id=<?= $us['id'] ?>" class="btn btn-warning">Update</a>
-                                    <a onclick="return confirm('Bạn có chắc muốn xóa?')" href="deleteUserAccount.php?id=<?= $us['id'] ?>" class="btn btn-danger">Delete</a>
+                                    <button class="btn btn-danger btn-delete" data-url="deleteUserAccount.php?id=<?= $us['id'] ?>" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+                                        Delete
+                                    </button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -119,6 +121,25 @@ if (isset($_GET['logout'])) {
             </div>
         </div>
     </div>
+    <!-- Modal xác nhận xóa -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">Xác nhận xóa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Bạn có chắc chắn muốn xóa tài khoản này không?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Xóa</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
     <script>
@@ -134,6 +155,20 @@ if (isset($_GET['logout'])) {
             });
         })
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+
+            document.querySelectorAll(".btn-delete").forEach(button => {
+                button.addEventListener("click", function() {
+                    let deleteUrl = this.getAttribute("data-url");
+                    confirmDeleteBtn.setAttribute("href", deleteUrl);
+                });
+            });
+        });
+    </script>
+
 </body>
 
 </html>

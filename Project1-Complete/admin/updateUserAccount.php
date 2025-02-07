@@ -3,6 +3,8 @@ require_once 'connect.php';
 require_once 'utils.php';
 
 $errors = [];
+$success = false;
+
 
 if (isset($_POST['updateuser'])) {
     $username = isset($_POST['username']) ? sanitize($_POST['username']) : '';
@@ -25,9 +27,7 @@ if (isset($_POST['updateuser'])) {
             $res = $conn->query($sql);
             $conn->commit();
 
-            header('Location: index.php');
-            exit; 
-
+            $success = true;
         } catch (Exception $e) {
             echo $e->getMessage();
             $conn->rollback();
@@ -62,6 +62,40 @@ if (isset($_GET['id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update User Account</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+    <style>
+        /* CSS cho modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            width: 300px;
+        }
+
+        .modal button {
+            margin-top: 10px;
+            padding: 8px 16px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 
 <body>
@@ -91,6 +125,24 @@ if (isset($_GET['id'])) {
             </div>
         </div>
     </div>
+
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h3>Cập nhật thành công!</h3>
+            <p>Bạn sẽ được chuyển hướng đến trang quản trị.</p>
+            <button onclick="redirectToAdmin()">OK</button>
+        </div>
+    </div>
+
+    <script>
+        function redirectToAdmin() {
+            window.location.href = "index.php";
+        }
+
+        <?php if ($success): ?>
+            document.getElementById("successModal").style.display = "flex";
+        <?php endif; ?>
+    </script>
 </body>
 
 </html>

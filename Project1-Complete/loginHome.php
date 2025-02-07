@@ -2,7 +2,9 @@
 session_start();
 require_once './admin/connect.php';
 
-$error = ""; 
+$error = "";
+$success = false; 
+
 
 if (isset($_POST['loginuser'])) {
     $username = trim($_POST['username']);
@@ -17,9 +19,8 @@ if (isset($_POST['loginuser'])) {
     if ($res->num_rows > 0) {
         $user = $res->fetch_assoc();
         if (password_verify($password, $user['password'])) {
-            $_SESSION['loginus'] = $user['username']; 
-            header('Location: index.php');
-            exit();
+            $_SESSION['loginus'] = $user['username'];
+            $success = true; 
         } else {
             $error = "Tài khoản hoặc mật khẩu không đúng!";
         }
@@ -31,6 +32,7 @@ if (isset($_POST['loginuser'])) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -38,7 +40,40 @@ if (isset($_POST['loginuser'])) {
     <link rel="stylesheet" href="../css/styleadmin.css">
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
     <title>Login</title>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            width: 300px;
+        }
+
+        .modal button {
+            margin-top: 10px;
+            padding: 8px 16px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
 </head>
+
 <body>
     <div class="wrapper">
         <span class="icon-close"><ion-icon name="close-outline"></ion-icon></span>
@@ -63,7 +98,25 @@ if (isset($_POST['loginuser'])) {
             </form>
         </div>
     </div>
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h3>Đăng nhập thành công!</h3>
+            <p>Bạn sẽ được chuyển hướng đến trang chủ.</p>
+            <button onclick="redirectToIndex()">OK</button>
+        </div>
+    </div>
+
+    <script>
+        function redirectToIndex() {
+            window.location.href = "index.php";
+        }
+
+        <?php if ($success): ?>
+            document.getElementById("successModal").style.display = "flex";
+        <?php endif; ?>
+    </script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </body>
+
 </html>

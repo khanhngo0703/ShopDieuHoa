@@ -3,6 +3,7 @@ session_start();
 require_once './admin/connect.php';
 
 $error = "";
+$success = false; // Biến kiểm tra trạng thái đăng ký thành công
 
 if (isset($_POST['registeruser'])) {
     $username = trim($_POST['username']);
@@ -24,8 +25,7 @@ if (isset($_POST['registeruser'])) {
 
             if ($conn->query($sql) === TRUE) {
                 $_SESSION['loginus'] = $username;
-                header('Location: loginHome.php');
-                exit();
+                $success = true; // Đăng ký thành công
             } else {
                 $error = "Đăng ký thất bại. Vui lòng thử lại!";
             }
@@ -35,7 +35,7 @@ if (isset($_POST['registeruser'])) {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="UTF-8">
@@ -44,11 +44,43 @@ if (isset($_POST['registeruser'])) {
     <link rel="stylesheet" href="../css/styleadmin.css">
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
     <title>Register</title>
+    <style>
+        /* CSS cho modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            width: 300px;
+        }
+
+        .modal button {
+            margin-top: 10px;
+            padding: 8px 16px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 
 <body>
     <div class="wrapper">
-        <span class="icon-close"><ion-icon name="close-outline"></ion-icon></span>
         <div class="form-box register">
             <h2>REGISTER</h2>
             <form action="" method="post">
@@ -78,6 +110,25 @@ if (isset($_POST['registeruser'])) {
             </form>
         </div>
     </div>
+
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h3>Đăng ký thành công!</h3>
+            <p>Bạn sẽ được chuyển hướng đến trang đăng nhập.</p>
+            <button onclick="redirectToLogin()">OK</button>
+        </div>
+    </div>
+
+    <script>
+        function redirectToLogin() {
+            window.location.href = "loginHome.php";
+        }
+
+        <?php if ($success): ?>
+            document.getElementById("successModal").style.display = "flex";
+        <?php endif; ?>
+    </script>
+
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </body>
